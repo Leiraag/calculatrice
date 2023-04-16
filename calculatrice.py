@@ -1,3 +1,6 @@
+#Il faut mettre un espace entre chque nombre et opérateur.
+#Le bouton notation permet de passer de l'écriture polonaise inversé à l'écriture polonaise et inversement.
+
 from Pile import Pile_lst as Pile
 from tkinter import *
 class Expression:
@@ -29,21 +32,23 @@ class Calcul:
     def __init__(self, ch):
         self.ch = ch
         self.type_notation = "polonaise inversée"
+        
     def ajout(self, val):
         self.ch += val
         expression['text'] = self.ch
+        
     def retour(self):
         self.ch = self.ch[:-1]
         expression['text'] = self.ch
-    def retour(self):
+        
+    def effacer(self):
         self.ch = ""
         expression['text'] = ""
+        
     def notation(self):
         if self.type_notation == "polonaise inversée":
             self.type_notation = "polonaise"
         elif self.type_notation == "polonaise":
-            self.type_notation = "classique"
-        else:
             self.type_notation = "polonaise inversée"
         b_type['text'] = "Notation : " + self.type_notation
     
@@ -69,16 +74,14 @@ def np2tree(lst):
             pile.empiler(Expression(lst[n],None,None))
     return pile.sommet()
 
-def calculer(ch):
+def calculer():
     lst = calcul.ch.split()
     if calcul.type_notation == "polonaise inversée":
         exp = npi2tree(lst)
-    elif self.type_notation == "polonaise":
+    elif calcul.type_notation == "polonaise":
         exp = np2tree(lst)
-    else:
-        pass
     res = exp.evalue()
-    expression['text'] = str(res) 
+    resultat['text'] = str(res) 
     
 calcul= Calcul("")
 fenetre=Tk()
@@ -111,16 +114,27 @@ b0 = Button(fenetre, text ="0", command = lambda: calcul.ajout("0"))
 b0.grid(row=5, column=1)
 b_virgule = Button(fenetre, text =",", command = lambda: calcul.ajout("."))
 b_virgule.grid(row=5, column=0)
+b_plus = Button(fenetre, text ="+", command = lambda: calcul.ajout("+"))
+b_plus.grid(row=3, column=3)
+b_moins = Button(fenetre, text ="-", command = lambda: calcul.ajout("-"))
+b_moins.grid(row=3, column=4)
+b_fois = Button(fenetre, text ="x", command = lambda: calcul.ajout("*"))
+b_fois.grid(row=4, column=3)
+b_divise = Button(fenetre, text ="/", command = lambda: calcul.ajout("/"))
+b_divise.grid(row=4, column=4)
+b_puissance = Button(fenetre, text ="^", command = lambda: calcul.ajout("^"))
+b_puissance.grid(row=5, column=4)
+
 
 b_retour = Button(fenetre, text ="Retour", command = lambda: calcul.retour())
 b_retour.grid(row=6, column=1)
-b_effacer = Button(fenetre, text ="Effacer", command = lambda: calcul.effacer)
+b_effacer = Button(fenetre, text ="Effacer", command = lambda: calcul.effacer())
 b_effacer.grid(row=6, column=2)
 b_resultat = Button(fenetre, text ="Résultat", command = lambda: calculer())
-b_resultat.grid(row=6, column=3)
+b_resultat.grid(row=6, column=4)
 b_type = Button(fenetre, text ="Notation: polonaise inversée", command = lambda: calcul.notation())
-b_type.grid(row=5, column=2, columnspan=3)
+b_type.grid(row=2, column=3, columnspan=2)
 b_espace = Button(fenetre, text ="Espace", command = lambda: calcul.ajout(" "))
-b_espace.grid(row=6, column=4)
-b_quitter = Button(fenetre, text ="Quitter", command = lambda: quit())
+b_espace.grid(row=6, column=3)
+b_quitter = Button(fenetre, text ="Quitter", command = lambda: fenetre.destroy())
 b_quitter.grid(row=6, column=0)
