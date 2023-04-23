@@ -1,6 +1,5 @@
-#Il faut mettre un espace entre chque nombre et opérateur.
-#Le bouton notation permet de passer de l'écriture polonaise inversé à l'écriture polonaise et inversement.
-
+#Il faut mettre un espace entre chaque nombre, parenthèse et opérateur.
+#Le bouton notation permet changer de notation
 from Pile import Pile_lst as Pile
 from tkinter import *
 class Expression:
@@ -49,6 +48,8 @@ class Calcul:
         if self.type_notation == "polonaise inversée":
             self.type_notation = "polonaise"
         elif self.type_notation == "polonaise":
+            self.type_notation = "classique"
+        else:
             self.type_notation = "polonaise inversée"
         b_type['text'] = "Notation : " + self.type_notation
     
@@ -74,12 +75,52 @@ def np2tree(lst):
             pile.empiler(Expression(lst[n],None,None))
     return pile.sommet()
 
+def prioritaire(o):
+    if o == "+" or o == "-":
+        associatif = "g"
+        prioriter = 1
+    elif o == "*" or o == "/":
+        associatif = "g"
+        prioriter = 2
+    else:
+        associatif = "d"
+        prioriter = 3
+    return associatif, prioriter
+
+def shuntingyard(lst):
+    lstnpi = []
+    pile = Pile()
+    for i in range(len(lst)):
+        if lst[i] == "+" or lst[i] == "-" or lst[i] == "*" or lst[i] == "/" or lst[i] == "^":
+            o1_associatif, o1_prioriter = prioritaire(lst[i])
+            if not pile.est_vide():
+                o2_associatif, o2_prioriter = prioritaire(pile.sommet())
+                while (not pile.est_vide() and pile.sommet() != "(" ) and ((o1_associatif == "g" and o1_prioriter <= o2_prioriter) or (o1_associatif == "d" and o1_prioriter < o2_prioriter)):
+                    lstnpi.append(pile.depiler())
+                    if not pile.est_vide() and pile.sommet() != "(":
+                        o2_associatif, o2_prioriter = prioritaire(pile.sommet())
+            pile.empiler(lst[i])
+        elif lst[i] == "(":
+            pile.empiler(lst[i])
+        elif lst[i] == ")":
+            while pile.sommet() != "(":
+                lstnpi.append(pile.depiler())
+            pile.depiler()
+        else:
+            lstnpi.append(lst[i])
+    while not pile.est_vide():
+        lstnpi.append(pile.depiler())
+    return lstnpi
+        
 def calculer():
     lst = calcul.ch.split()
     if calcul.type_notation == "polonaise inversée":
         exp = npi2tree(lst)
     elif calcul.type_notation == "polonaise":
         exp = np2tree(lst)
+    else:
+        lstnpi = shuntingyard(lst)
+        exp = npi2tree(lstnpi)
     res = exp.evalue()
     resultat['text'] = str(res) 
     
@@ -124,7 +165,10 @@ b_divise = Button(fenetre, text ="/", command = lambda: calcul.ajout("/"))
 b_divise.grid(row=4, column=4)
 b_puissance = Button(fenetre, text ="^", command = lambda: calcul.ajout("^"))
 b_puissance.grid(row=5, column=4)
-
+b_paranthese_l = Button(fenetre, text ="(", command = lambda: calcul.ajout("("))
+b_paranthese_l.grid(row=5, column=2)
+b_paranthese_r = Button(fenetre, text =")", command = lambda: calcul.ajout(")"))
+b_paranthese_r.grid(row=5, column=3)
 
 b_retour = Button(fenetre, text ="Retour", command = lambda: calcul.retour())
 b_retour.grid(row=6, column=1)
